@@ -15,5 +15,4 @@ description: Add or change a screen of this mini app (an app in the manifest) â€
 3. **Grant before you call.** Every tool the screen calls is in its `permissions.tools`, and nothing else.
 4. **Test** that the screen's tools answer as that app: `h.app(<id>, <tool>, â€¦)` in `tests/tools.rs`.
 
-Done when `tools/check-all.sh` passes. Until the Bot's native-screen PR merges, conformance's two APP-01 rows fail
-for a native screen; every other row, `BRG-03` for this app included, passes.
+Done when `tools/check-all.sh` passes.

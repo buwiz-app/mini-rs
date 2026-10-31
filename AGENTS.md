@@ -26,5 +26,4 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
 
 `tools/check-all.sh` passes before every commit: `cargo fmt --check`, `cargo clippy --all-targets -D warnings`,
 `cargo test`, and `tools/bot/conformance.sh`, which needs a buwiz-bot checkout in `BUWIZ_BOT_DIR` (`docs/guide.md`
-section 7). `SKIP_BOT=1` skips conformance and fails the run, so a skip never reads as a pass. Until the Bot's
-native-screen PR merges, conformance reports two APP-01 failures for a native screen; every other row passes.
+section 7). `SKIP_BOT=1` skips conformance and fails the run, so a skip never reads as a pass.

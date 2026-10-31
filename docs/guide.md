@@ -125,9 +125,7 @@ git clone https://github.com/buwiz-bot/buwiz-bot && (cd buwiz-bot/server && npm 
 BUWIZ_BOT_DIR=$PWD/buwiz-bot tools/bot/conformance.sh
 ```
 
-It signs with a throwaway key under a test key id, never the release key. Until the Bot's native-screen PR merges,
-its runner reports two APP-01 failures for a native screen ("is one text/x-nsh-tsx content", "has no source").
-They are the runner's, and everything else must pass.
+It signs with a throwaway key under a test key id, never the release key. Every row must pass.
 
 ## 8. What the SDK checks, and what is yours
 
