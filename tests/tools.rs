@@ -35,7 +35,7 @@ fn a_friend_resolves_to_a_ticket_that_greets_them() {
 }
 
 #[test]
-fn a_ticket_hello_did_not_issue_is_refused() {
+fn a_ticket_not_issued_here_is_refused() {
     let mut h = Harness::new(Hello::default());
     let refused = h.agent(
         "hello_greet",
