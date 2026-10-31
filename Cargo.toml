@@ -1,0 +1,22 @@
+[workspace]
+resolver = "3"
+members = ["crates/hello-mini-app"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.88"
+license = "UNLICENSED"
+publish = false
+
+[workspace.dependencies]
+# The SDK, pinned by commit; a new SDK is a new rev (then run tools/check-all.sh).
+buwiz-plugin = { git = "https://github.com/buwiz-app/buwiz-sdk", rev = "e33cbbee0b246b51e36b33a8db06a9d7a18a6eae" }
+serde_json = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+

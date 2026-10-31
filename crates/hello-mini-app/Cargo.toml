@@ -1,0 +1,28 @@
+[package]
+name = "hello-mini-app"
+version = "0.1.0"
+description = "Hello, the mini-rs template's mini app (app.buwiz.hello): the MCP server the Buwiz Bot spawns"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "hello-mini-app"
+path = "src/main.rs"
+
+# The repo's integration tests live in the root tests/.
+[[test]]
+name = "manifest"
+path = "../../tests/manifest.rs"
+
+[[test]]
+name = "tools"
+path = "../../tests/tools.rs"
+
+[dependencies]
+buwiz-plugin.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true
