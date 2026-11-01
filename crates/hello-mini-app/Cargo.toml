@@ -1,6 +1,6 @@
 [package]
 name = "hello-mini-app"
-version = "0.1.0"
+version = "0.1.1"
 description = "Hello, the mini-rs template's mini app (app.buwiz.hello): the MCP server the Buwiz Bot spawns"
 edition.workspace = true
 rust-version.workspace = true
