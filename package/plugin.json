@@ -1,0 +1,19 @@
+{
+  "name": "hello",
+  "version": "0.1.1",
+  "description": "Hello, the mini-rs template's mini app for Buwiz Bot.",
+  "author": { "name": "Buwiz" },
+  "mcpServers": {
+    "hello": { "command": "${PLUGIN_ROOT}/bin/hello-mini-app", "args": ["mcp"] }
+  },
+  "buwiz": {
+    "protocol": "1.0.0",
+    "id": "app.buwiz.hello",
+    "short": "hello",
+    "version": "0.1.1",
+    "server": "hello",
+    "files": {},
+    "binaries": {},
+    "publisher": { "id": "app.buwiz", "key_id": "gc-2026-01" }
+  }
+}

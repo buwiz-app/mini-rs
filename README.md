@@ -1,6 +1,6 @@
 # mini-rs
 
-A template for a Buwiz Bot mini app in Rust, with native Rust screens. Fork it, run one command to name it, and
+A template for a Buwiz Bot mini app in Rust, with native Rust screens, on Buwiz Mini App Protocol 1.0. Fork it, run one command to name it, and
 build: the protocol comes from [buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), so the template holds only
 what is yours.
 
@@ -18,7 +18,8 @@ tool, `hello_resolve`), and one native screen (`hello.home`).
 | `crates/hello-mini-app/` | The mini app: `manifest.rs`, `tools.rs`, and the `Plugin` impl in `lib.rs` |
 | `crates/hello-screens/` | Native `hello.home` screen and fake-host tests |
 | `tests/` | Integration tests |
-| `tools/` | `new.sh`, `check-all.sh`, `bot/conformance.sh`, `release/prepare.sh` |
+| `package/plugin.json` | The package template a release fills and signs (protocol 1.0 section 7) |
+| `tools/` | `new.sh`, `check-all.sh`, `bot/conformance.sh`, `release/publish.sh` |
 | `docs/guide.md` | The walkthrough: tools, commands and scopes, screens, routines, tests, release |
 | `.claude/skills/` | Skills for coding agents: add a tool, a command or scope, a screen; release |
 

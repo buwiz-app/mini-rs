@@ -3,7 +3,7 @@
 Hello's native screens: Rust, built into the Buwiz Bot, in place of TSX. The manifest's `home` app names one:
 `"native": { "screen": "hello.home", "abi": 1 }`.
 
-This crate uses [buwiz-sdk `crates/app`](https://github.com/buwiz-app/buwiz-sdk/tree/2120c725112e2072b22f6630079fc938b6c9b1e9/crates/app).
+This crate uses [buwiz-sdk `crates/app`](https://github.com/buwiz-app/buwiz-sdk/tree/fff55d395d1c5c524833ec1073c43d34ac542070/crates/app).
 It exports the screen for the Bot to register under `app.buwiz.hello`:
 
 ```rust

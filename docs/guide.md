@@ -7,7 +7,9 @@ A signed **manifest** declares all of it, and the Bot trusts nothing the manifes
 
 You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
-reserved `buwiz.*` tools, session certificates, tickets, and the caller checks.
+reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
+package. The protocol is Buwiz Mini App Protocol 1.0
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/protocol-1.0.md)); the manifest declares `1.0.0`.
 
 ## 1. Make it yours
 
@@ -29,9 +31,10 @@ README, then builds and tests. The rest of this guide calls the app Hello.
 | `crates/hello-mini-app/src/tools.rs` | The tools: `list()` (what the model sees) and `call()` (what runs) |
 | `crates/hello-mini-app/src/lib.rs` | `Hello`: the state (tickets, your store) and the `Plugin` impl that ties it together |
 | `crates/hello-mini-app/src/main.rs` | One line: the SDK's command line |
-| `crates/hello-screens/` | Native screens, once the native-screen SDK lands ([its README](../crates/hello-screens/README.md)) |
+| `crates/hello-screens/` | Native screens, on the SDK's `buwiz-app` crate ([its README](../crates/hello-screens/README.md)) |
+| `package/plugin.json` | The package template a release fills and signs (section 10) |
 | `tests/` | Integration tests, through the SDK's harness |
-| `tools/` | `check-all.sh` (every gate), `bot/conformance.sh`, `release/prepare.sh`, `new.sh` |
+| `tools/` | `check-all.sh` (every gate), `bot/conformance.sh`, `release/publish.sh`, `new.sh` |
 
 The binary's command line comes from the SDK:
 
@@ -39,6 +42,8 @@ The binary's command line comes from the SDK:
 hello-mini-app mcp                       what the Bot runs
 hello-mini-app manifest [--key-id <id>]  the unsigned manifest, for signing
 hello-mini-app app-source <id>           a TSX app's source (none here: Hello's screens are native)
+hello-mini-app package <plugin.json> <out> <platform> [--published <plugin.json>]
+                                         fill a release's plugin.json to sign (section 10)
 ```
 
 ## 3. Add a tool
@@ -84,9 +89,8 @@ Hello's screens are **native**: Rust, compiled into the Bot. An app entry in the
 ```
 
 `permissions` grants exactly what the screen uses: the tools it calls, and `open`, `attach`, `pick_file`,
-`storage`, `copy` or `preview` if it needs them. The screen's code goes in `crates/hello-screens` once the
-native-screen SDK ships. Until then the screen verifies at install and opens to "this screen needs a newer Buwiz
-Bot".
+`storage`, `copy` or `preview` if it needs them. The screen's code goes in `crates/hello-screens`, on the SDK's
+`buwiz-app` crate, and the Bot compiles it in.
 
 Native screens are for first-party publishers. Outside `app.buwiz`, ship TSX screens: see
 [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
@@ -148,12 +152,39 @@ The full rules: the Bot's [security checklist](https://github.com/buwiz-bot/buwi
 [manifest reference](https://github.com/buwiz-bot/buwiz-bot/blob/main/server/sdk/mini-app/docs/manifest.md) and
 [bridge](https://github.com/buwiz-bot/buwiz-bot/blob/main/server/sdk/mini-app/docs/bridge.md).
 
-## 9. Release
+## 9. Accounts
 
-1. Raise `version` in `crates/hello-mini-app/Cargo.toml`: any change to the manifest or a screen needs a new
-   version and a new signature.
+A package may declare accounts in `package/plugin.json` (`buwiz.accounts`, protocol 1.0 section 20), such as
+`{ "id": "google", "provider": "google", "label": "Google account", "scopes": […] }`. The Bot signs the person in
+and pushes the token; the SDK keeps it in memory. A tool reads it from its caller, and without one asks for a
+sign-in:
+
+```rust
+use buwiz_plugin::account_required;
+
+let Some(google) = caller.account("google") else {
+    return account_required("google"); // the Bot asks the person to sign in
+};
+let header = google.authorization(); // "Bearer …": never log it or put it in an answer
+```
+
+## 10. Release
+
+A release is a package (protocol 1.0 section 7): `plugin.json` with a signed `buwiz` block, the signed manifest
+and one binary per platform, as flat GitHub release assets.
+
+1. Raise `version` in `crates/hello-mini-app/Cargo.toml`, and both `version`s in `package/plugin.json`: any change
+   to the manifest or a screen needs a new version and a new signature.
 2. `tools/check-all.sh`.
-3. `tools/release/prepare.sh` builds the binary and the unsigned manifest into `dist/release/`, and prints the
-   rest. The Bot's owner approves the plugin id in the Bot's trust store, the publisher signs the manifest with
-   the release key (`gc-2026-01` for `app.buwiz`), and the signed `<plugin id>.manifest.json` ships next to the
-   binary.
+3. The publisher (the owner: the release key `gc-2026-01` for `app.buwiz` is in the Keychain) runs
+   `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build. It builds the binary, signs
+   the manifest as `<plugin id>.manifest.json`, has the binary's `package` command fill `package/plugin.json`
+   (the manifest at `bin/<plugin id>.manifest.json`, the binary at `bin/hello-mini-app`, each with its SHA-256),
+   and signs its `buwiz` block with `buwiz-broker sign-manifest --block buwiz`, all into `dist/release/`.
+   `--publish` creates the GitHub release `v<version>` (on a second platform it adds that binary to the
+   release's `plugin.json`); `--publish --prerelease` makes it a pre-release, which the Bot's install from the
+   repo URL skips, for a coordinated switch.
+4. The Bot's owner approves the plugin id under the release key in the Bot's trust store.
+
+For a local check without the Keychain, sign under a test key id with a throwaway key and check the result as
+the Bot does: `KEY_ID=hello-test-01 tools/release/publish.sh --key-file <test key> --trust <trust store>`.

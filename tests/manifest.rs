@@ -36,3 +36,22 @@ fn every_screen_is_native() {
         assert!(app.get("entry").is_none(), "{} is TSX", app["id"]);
     }
 }
+
+#[test]
+fn the_package_template_matches_the_manifest() {
+    // package/plugin.json, which `tools/release/publish.sh` fills and signs
+    let plugin: serde_json::Value =
+        serde_json::from_str(include_str!("../package/plugin.json")).unwrap();
+    let manifest = Hello::manifest(Hello::RELEASE_KEY_ID);
+    let block = &plugin["buwiz"];
+    assert_eq!(block["protocol"], manifest::PROTOCOL);
+    for key in ["id", "short", "version"] {
+        assert_eq!(block[key], manifest[key], "buwiz.{key}");
+    }
+    assert_eq!(plugin["version"], manifest["version"]);
+    assert_eq!(
+        block["publisher"]["key_id"],
+        manifest["publisher"]["key_id"]
+    );
+    assert!(plugin["mcpServers"][block["server"].as_str().unwrap()].is_object());
+}
