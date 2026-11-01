@@ -16,7 +16,7 @@ tool, `hello_resolve`), and one native screen (`hello.home`).
 | Path | What |
 |---|---|
 | `crates/hello-mini-app/` | The mini app: `manifest.rs`, `tools.rs`, and the `Plugin` impl in `lib.rs` |
-| `crates/hello-screens/` | Native screens, once the native-screen SDK ships |
+| `crates/hello-screens/` | Native `hello.home` screen and fake-host tests |
 | `tests/` | Integration tests |
 | `tools/` | `new.sh`, `check-all.sh`, `bot/conformance.sh`, `release/prepare.sh` |
 | `docs/guide.md` | The walkthrough: tools, commands and scopes, screens, routines, tests, release |
