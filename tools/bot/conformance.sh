@@ -13,7 +13,7 @@
 #   6. run the runner, which spawns the binary the way the broker does.
 #
 # The release manifest keeps the release key id; only the owner signs it
-# (tools/release/prepare.sh). Nothing here touches the Keychain or a Bot's
+# (tools/release/publish.sh). Nothing here touches the Keychain or a Bot's
 # data folder.
 #
 # Usage: tools/bot/conformance.sh [runner args, e.g. --json]
@@ -31,7 +31,7 @@ SIGNER="$BOT/server/src/v1/sign-manifest.mjs"
 
 die() { echo "conformance: $*" >&2; exit 2; }
 [ -n "$BOT" ] || die "set BUWIZ_BOT_DIR to a buwiz-bot checkout (git clone https://github.com/buwiz-bot/buwiz-bot; cd buwiz-bot/server; npm ci)"
-for f in "$RUNNER" "$SIGNER"; do [ -f "$f" ] || die "$f not found: is BUWIZ_BOT_DIR a buwiz-bot checkout on protocol 2.0?"; done
+for f in "$RUNNER" "$SIGNER"; do [ -f "$f" ] || die "$f not found: is BUWIZ_BOT_DIR a buwiz-bot checkout on protocol 1.0?"; done
 [ -d "$BOT/server/node_modules/@modelcontextprotocol/sdk" ] || die "the Bot's server/node_modules is missing: cd $BOT/server && npm ci"
 command -v node >/dev/null || die "node is needed to run the Bot's tools"
 

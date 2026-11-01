@@ -1,9 +1,9 @@
 # AGENTS.md
 
-A Buwiz Bot mini app in Rust (protocol 2.0), made from the `buwiz-app/mini-rs` template. The SDK
+A Buwiz Bot mini app in Rust (Buwiz Mini App Protocol 1.0), made from the `buwiz-app/mini-rs` template. The SDK
 (`buwiz-plugin`, from `buwiz-app/buwiz-sdk`, pinned by rev in the root `Cargo.toml`) does the protocol; this repo
-holds the manifest (`src/manifest.rs`), the tools (`src/tools.rs`) and the screens. `docs/guide.md` is the
-reference for every part.
+holds the manifest (`src/manifest.rs`), the tools (`src/tools.rs`), the screens and the package template
+(`package/plugin.json`). `docs/guide.md` is the reference for every part.
 
 Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, `release`.
 
@@ -18,9 +18,10 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
 4. **Text without secrets.** No subject data and never a key in a message, title or log (P4, P9). Side effects sit
    behind explicit arguments, so a call with `{}` changes nothing (P5).
 5. **One version, one signature.** Any change to the manifest or a screen raises `version` in the crate's
-   `Cargo.toml`. Tests sign with a throwaway test key id (`hello-test-01`); only the owner signs a release with the
-   release key, from the Keychain. Agents never touch the Keychain.
-6. **One protocol version.** No shims for older protocol names or versions.
+   `Cargo.toml` and both `version`s in `package/plugin.json` (`tests/manifest.rs` checks they match). Tests sign
+   with a throwaway test key id (`hello-test-01`); only the owner signs a release with the release key, from the
+   Keychain. Agents never touch the Keychain.
+6. **One protocol version.** Protocol 1.0 (`1.0.0`) only. No shims for older protocol names or versions.
 
 ## Gates
 
