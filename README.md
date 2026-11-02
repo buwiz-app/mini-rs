@@ -25,3 +25,8 @@ tool, `hello_resolve`), and one native screen (`hello.home`).
 
 Want TSX screens, or TypeScript throughout? Use [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
 Native screens are for first-party (`app.buwiz`) mini apps; any publisher can ship TSX.
+
+## License
+
+Apache License 2.0 ([LICENSE](LICENSE); `NOTICE` holds the copyright line). A mini app made from this template
+starts under the same license: change `LICENSE`, `NOTICE` and the license field if yours differs.
