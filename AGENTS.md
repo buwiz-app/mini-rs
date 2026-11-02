@@ -18,9 +18,9 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
 4. **Text without secrets.** No subject data and never a key in a message, title or log (P4, P9). Side effects sit
    behind explicit arguments, so a call with `{}` changes nothing (P5).
 5. **One version, one signature.** Any change to the manifest or a screen raises `version` in the crate's
-   `Cargo.toml` and both `version`s in `package/plugin.json` (`tests/manifest.rs` checks they match). Tests sign
-   with a throwaway test key id (`hello-test-01`); only the owner signs a release with the release key, from the
-   Keychain. Agents never touch the Keychain.
+   `Cargo.toml`, the one place: `package` fills `package/plugin.json`'s version, ids and publisher from the
+   signed manifest. Tests sign with a throwaway test key id (`hello-test-01`); only the owner signs a release
+   with the release key, from the Keychain. Agents never touch the Keychain.
 6. **One protocol version.** Protocol 1.0 (`1.0.0`) only. No shims for older protocol names or versions.
 
 ## Gates

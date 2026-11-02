@@ -168,18 +168,33 @@ let Some(google) = caller.account("google") else {
 let header = google.authorization(); // "Bearer …": never log it or put it in an answer
 ```
 
+In tests, the harness signs in and out as the Bot does. Use a synthetic token, never a real one:
+
+```rust
+let mut h = Harness::new(Hello::default());
+h.sign_in("google", "synthetic-token"); // the `default` sign-in: provider google, no expiry
+h.agent("hello_events", json!({}));      // a tool of yours: caller.account("google") is that sign-in
+h.sign_out("google");
+h.agent("hello_events", json!({}));      // now it answers account_required("google")
+```
+
+`h.sign_in_with(json!({ "account": "google", "label": "work", "access_token": "synthetic-token", "scopes": […] }))`
+pushes another label, scopes or an expiry (`expires_at`); `h.sign_out_label("google", "work")` clears that one.
+
 ## 10. Release
 
 A release is a package (protocol 1.0 section 7): `plugin.json` with a signed `buwiz` block, the signed manifest
 and one binary per platform, as flat GitHub release assets.
 
-1. Raise `version` in `crates/hello-mini-app/Cargo.toml`, and both `version`s in `package/plugin.json`: any change
-   to the manifest or a screen needs a new version and a new signature.
+1. Raise `version` in `crates/hello-mini-app/Cargo.toml`: any change to the manifest or a screen needs a new
+   version and a new signature. That is the one place: the manifest takes the crate's version, and `package`
+   takes `plugin.json`'s version, ids and publisher from the signed manifest.
 2. `tools/check-all.sh`.
 3. The publisher (the owner: the release key `gc-2026-01` for `app.buwiz` is in the Keychain) runs
    `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build. It builds the binary, signs
    the manifest as `<plugin id>.manifest.json`, has the binary's `package` command fill `package/plugin.json`
-   (the manifest at `bin/<plugin id>.manifest.json`, the binary at `bin/hello-mini-app`, each with its SHA-256),
+   (the version, ids and publisher from the signed manifest; the manifest at `bin/<plugin id>.manifest.json`
+   and the binary at `bin/hello-mini-app`, each with its SHA-256),
    and signs its `buwiz` block with `buwiz-broker sign-manifest --block buwiz`, all into `dist/release/`.
    `--publish` creates the GitHub release `v<version>` (on a second platform it adds that binary to the
    release's `plugin.json`); `--publish --prerelease` makes it a pre-release, which the Bot's install from the

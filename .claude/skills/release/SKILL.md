@@ -8,8 +8,9 @@ description: Get a release of this mini app ready for the publisher to sign and 
 A protocol 1.0 release is a package: `plugin.json` with a signed `buwiz` block, the signed manifest and one binary
 per platform, as GitHub release assets (`docs/guide.md` section 10).
 
-1. **Raise the version** in `crates/<short>-mini-app/Cargo.toml`, semver, and both `version`s in
-   `package/plugin.json` to match. Any change to the manifest or a screen since the last release needs it.
+1. **Raise the version** in `crates/<short>-mini-app/Cargo.toml`, semver. It is the one place: the manifest takes
+   it, and `package` fills `package/plugin.json`'s from the signed manifest. Any change to the manifest or a
+   screen since the last release needs it.
 2. **Pass every gate:** `tools/check-all.sh`, conformance included, with no row failing beyond what `AGENTS.md`
    names as known.
 3. **Check the package locally**, with a throwaway key under a test key id, never the release key: make the key

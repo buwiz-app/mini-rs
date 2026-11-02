@@ -6,9 +6,10 @@
 #                            installed at bin/<binary>
 #   <plugin id>.manifest.json the signed manifest it serves, installed at
 #                            bin/<plugin id>.manifest.json beside it
-#   plugin.json              package/plugin.json with buwiz.files and
-#                            buwiz.binaries filled in by the binary's
-#                            `package` command, its buwiz block signed
+#   plugin.json              package/plugin.json filled in by the binary's
+#                            `package` command (version, ids and publisher
+#                            from the signed manifest, buwiz.files and
+#                            buwiz.binaries), its buwiz block signed
 # Both are signed with the publisher key from the login Keychain: macOS
 # asks twice (the manifest, then plugin.json). Only the owner runs that.
 #
@@ -30,8 +31,8 @@
 #                      sign-manifest and manifest checks
 #   KEY_ID             the publisher key id to sign under (default: the
 #                      release key id); another id, such as a test key's,
-#                      goes into the manifest and plugin.json for a local
-#                      check, never with --publish
+#                      goes into the manifest (and from it plugin.json) for
+#                      a local check, never with --publish
 #   GH_REPO            default: this checkout's GitHub repo (gh repo view)
 set -euo pipefail
 
@@ -80,14 +81,11 @@ VERSION="$(json m.version)"
 RELEASE_KEY_ID="$(json m.publisher.key_id)"
 KEY_ID="${KEY_ID:-$RELEASE_KEY_ID}"
 TAG="v$VERSION"
-TEMPLATE=package/plugin.json
 if [ "$KEY_ID" != "$RELEASE_KEY_ID" ]; then
-  # a local check under another key id: the manifest and plugin.json name it
+  # a local check under another key id: the manifest names it, and
+  # `package` takes plugin.json's from the signed manifest
   [ "$PUBLISH" = 0 ] || die "--publish signs under the release key id $RELEASE_KEY_ID only"
   "$BIN" manifest --key-id "$KEY_ID" >"$OUT/manifest.json"
-  TEMPLATE="$OUT/plugin.template.json"
-  node -e 'const fs = require("fs"); const p = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); p.buwiz.publisher.key_id = process.argv[3]; fs.writeFileSync(process.argv[2], JSON.stringify(p, null, 2) + "\n")' \
-    package/plugin.json "$TEMPLATE" "$KEY_ID"
 fi
 if [ -n "$KEY_FILE" ]; then SIGN=(--key-file "$KEY_FILE"); HOW="(a key file)"; else SIGN=(--keychain "$KEY_ID"); HOW="(approve the Keychain prompt)"; fi
 
@@ -114,9 +112,10 @@ if [ "$PUBLISH" = 1 ]; then
     echo "$TAG exists: adding $PLATFORM to its plugin.json" >&2
   fi
 fi
-# fills buwiz.files and buwiz.binaries; writes plugin.unsigned.json
-"$BIN" package "$TEMPLATE" "$OUT" "$PLATFORM" ${PUBLISHED[@]+"${PUBLISHED[@]}"}
-rm -f "$OUT/published.plugin.json" "$OUT/plugin.template.json"
+# takes the version, ids and publisher from the signed manifest, fills
+# buwiz.files and buwiz.binaries; writes plugin.unsigned.json
+"$BIN" package package/plugin.json "$OUT" "$PLATFORM" ${PUBLISHED[@]+"${PUBLISHED[@]}"}
+rm -f "$OUT/published.plugin.json"
 
 echo "signing plugin.json's buwiz block with $KEY_ID $HOW" >&2
 "$BROKER" sign-manifest "$OUT/plugin.unsigned.json" --block buwiz "${SIGN[@]}" --out "$OUT/plugin.json"
