@@ -16,7 +16,7 @@ pub const ID: &str = "app.buwiz.hello";
 pub const SHORT: &str = "hello";
 /// The name the user sees.
 pub const TITLE: &str = "Hello";
-/// The publisher key a release is signed with. Only the owner signs.
+/// The publisher key a release is signed with. Only Buwiz signs.
 pub const RELEASE_KEY_ID: &str = "gc-2026-01";
 
 /// The manifest without its signature, under publisher key id `key_id`.

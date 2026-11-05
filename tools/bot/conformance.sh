@@ -12,7 +12,7 @@
 #      key (sign-manifest.mjs --key-file);
 #   6. run the runner, which spawns the binary the way the broker does.
 #
-# The release manifest keeps the release key id; only the owner signs it
+# The release manifest keeps the release key id; only Buwiz signs it
 # (tools/release/publish.sh). Nothing here touches the Keychain or a Bot's
 # data folder.
 #

@@ -1,6 +1,6 @@
 ---
 name: release
-description: Get a release of this mini app ready for the publisher to sign and publish — version bump, gates, a local package check with a throwaway key, then the owner's publish command. Use when asked to release, ship, publish or install a new build.
+description: Get a release of this mini app ready for Buwiz to review and sign — version bump, gates, a local package check with a throwaway key, then the hand-over to Buwiz. Use when asked to release, ship, publish or install a new build.
 ---
 
 # Prepare a release
@@ -18,11 +18,11 @@ per platform, as GitHub release assets (`docs/guide.md` section 10).
    for it (as `tools/bot/conformance.sh` does), then
    `KEY_ID=<short>-test-01 BUWIZ_BROKER_BIN=<buwiz-broker> tools/release/publish.sh --key-file <key> --trust <trust.json>`.
    Delete the temp dir after.
-4. **Hand over.** Give the owner the command to run on a clean commit:
-   `BUWIZ_BROKER_BIN=<buwiz-broker> tools/release/publish.sh --publish` (add `--prerelease` for a coordinated
-   switch: the Bot's install skips pre-releases), once per platform, and the trust entry
-   `{ "id": "<plugin id>", "publisher_key_id": "<release key id>" }` for the Bot's trust store. The owner signs
-   (the release key is in the login Keychain) and publishes; an agent never signs with the release key, touches
-   the Keychain or publishes.
+4. **Hand over.** The mini app goes to Buwiz for review; the way to submit isn't open yet. After review Buwiz runs,
+   on a clean commit, `BUWIZ_BROKER_BIN=<buwiz-broker> tools/release/publish.sh --publish` (add `--prerelease` for a
+   coordinated switch: the Bot's install skips pre-releases), once per platform, and adds the trust entry
+   `{ "id": "<plugin id>", "publisher_key_id": "<release key id>" }` to the Bot's trust store. Buwiz signs (the
+   release key is in the login Keychain) and publishes; an agent never signs with the release key, touches the
+   Keychain or publishes.
 
-Done when the gates pass, the local package check prints `checked:`, and the owner has the command.
+Done when the gates pass, the local package check prints `checked:`, and the new version is ready to submit.
