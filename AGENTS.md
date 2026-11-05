@@ -19,7 +19,7 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
    behind explicit arguments, so a call with `{}` changes nothing (P5).
 5. **One version, one signature.** Any change to the manifest or a screen raises `version` in the crate's
    `Cargo.toml`, the one place: `package` fills `package/plugin.json`'s version, ids and publisher from the
-   signed manifest. Tests sign with a throwaway test key id (`hello-test-01`); only the owner signs a release
+   signed manifest. Tests sign with a throwaway test key id (`hello-test-01`); only Buwiz signs a release
    with the release key, from the Keychain. Agents never touch the Keychain.
 6. **One protocol version.** Protocol 1.0 (`1.0.0`) only. No shims for older protocol names or versions.
 

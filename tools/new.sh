@@ -6,9 +6,7 @@
 #              prefix (<short>_…), the command (/<short>) and the crate
 #              (<short>-mini-app)
 #   Title      the name users see (1 to 60 characters)
-#   plugin id  reverse DNS (default app.buwiz.<short>); outside Buwiz, your
-#              own, e.g. com.example.<short>, with your own publisher in
-#              crates/<short>-mini-app/src/manifest.rs
+#   plugin id  reverse DNS (default app.buwiz.<short>)
 #
 # It renames the crates, ids, tool names, screen ids and docs, writes a
 # short README for your app, then builds and tests. Run it once, on a fresh

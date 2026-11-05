@@ -24,7 +24,10 @@ tool, `hello_resolve`), and one native screen (`hello.home`).
 | `.claude/skills/` | Skills for coding agents: add a tool, a command or scope, a screen; release |
 
 Want TSX screens, or TypeScript throughout? Use [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
-Native screens are for first-party (`app.buwiz`) mini apps; any publisher can ship TSX.
+Native screens are for first-party (`app.buwiz`) mini apps; every other mini app uses TSX.
+
+Anyone can build a mini app, but the Bot installs only mini apps Buwiz has signed: you submit yours, and Buwiz
+reviews it and signs it. The way to submit isn't open yet ([docs/guide.md](docs/guide.md) section 10).
 
 ## License
 

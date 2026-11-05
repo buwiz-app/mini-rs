@@ -14,5 +14,5 @@ assert_eq!(screens()[0].abi, 1);
 ```
 
 Native screens are for first-party publishers (`app.buwiz`, key `gc-2026-01`). The Bot compiles each first-party
-screens crate in, pinned by git rev, so a change to a screen ships with a Bot build. A plugin from another
-publisher serves TSX screens instead: see [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
+screens crate in, pinned by git rev, so a change to a screen ships with a Bot build. Any other mini app
+serves TSX screens instead: see [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).

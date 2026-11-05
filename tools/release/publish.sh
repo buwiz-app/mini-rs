@@ -11,7 +11,7 @@
 #                            from the signed manifest, buwiz.files and
 #                            buwiz.binaries), its buwiz block signed
 # Both are signed with the publisher key from the login Keychain: macOS
-# asks twice (the manifest, then plugin.json). Only the owner runs that.
+# asks twice (the manifest, then plugin.json). Only Buwiz runs that.
 #
 # With --publish it then creates the release v<version> on GitHub (gh), or,
 # when it exists (another platform's run), adds this platform's binary to

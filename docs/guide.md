@@ -11,6 +11,9 @@ reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, 
 package. The protocol is Buwiz Mini App Protocol 1.0
 ([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/protocol-1.0.md)); the manifest declares `1.0.0`.
 
+You can build and test a mini app freely. Before it installs in the Bot, Buwiz reviews it and signs it, so you need no
+signing key of your own (section 10).
+
 ## 1. Make it yours
 
 Click **Use this template** on GitHub (or clone it), then name your app:
@@ -183,6 +186,9 @@ pushes another label, scopes or an expiry (`expires_at`); `h.sign_out_label("goo
 
 ## 10. Release
 
+Only Buwiz signs a release, and the Bot installs only mini apps Buwiz has signed. You build and check your mini app,
+then submit it to Buwiz, which reviews it and signs it. The way to submit isn't open yet.
+
 A release is a package (protocol 1.0 section 7): `plugin.json` with a signed `buwiz` block, the signed manifest
 and one binary per platform, as flat GitHub release assets.
 
@@ -190,7 +196,8 @@ and one binary per platform, as flat GitHub release assets.
    version and a new signature. That is the one place: the manifest takes the crate's version, and `package`
    takes `plugin.json`'s version, ids and publisher from the signed manifest.
 2. `tools/check-all.sh`.
-3. The publisher (the owner: the release key `gc-2026-01` for `app.buwiz` is in the Keychain) runs
+3. Submit the mini app to Buwiz for review. The way to submit isn't open yet.
+4. After review, Buwiz (the release key `gc-2026-01` for `app.buwiz` is in the Keychain) runs
    `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build. It builds the binary, signs
    the manifest as `<plugin id>.manifest.json`, has the binary's `package` command fill `package/plugin.json`
    (the version, ids and publisher from the signed manifest; the manifest at `bin/<plugin id>.manifest.json`
@@ -199,7 +206,8 @@ and one binary per platform, as flat GitHub release assets.
    `--publish` creates the GitHub release `v<version>` (on a second platform it adds that binary to the
    release's `plugin.json`); `--publish --prerelease` makes it a pre-release, which the Bot's install from the
    repo URL skips, for a coordinated switch.
-4. The Bot's owner approves the plugin id under the release key in the Bot's trust store.
+5. Buwiz approves the plugin id under the release key in the Bot's trust store.
 
 For a local check without the Keychain, sign under a test key id with a throwaway key and check the result as
 the Bot does: `KEY_ID=hello-test-01 tools/release/publish.sh --key-file <test key> --trust <trust store>`.
+A package signed this way is only a check: the Bot installs what Buwiz has signed.
