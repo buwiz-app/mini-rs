@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# tools/check-all.sh — every gate: fmt, clippy, tests, then the SDK's
-# conformance runner (tools/conformance.sh, which needs BUWIZ_SDK_DIR).
+# tools/check-all.sh — every gate: fmt, clippy, tests, tools/new.sh on a temp
+# copy, then the SDK's conformance runner (tools/conformance.sh, which needs BUWIZ_SDK_DIR).
 # SKIP_CONFORMANCE=1 skips conformance, and the run then says it did not pass.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -13,6 +13,8 @@ step "cargo clippy"
 cargo clippy --all-targets --quiet -- -D warnings
 step "cargo test"
 cargo test --quiet
+step "tools/new.sh (a temp copy, offline)"
+tools/test-new.sh
 
 step "SDK doc links follow the pin"
 PIN="$(sed -n 's/^buwiz-plugin = .*rev = "\([0-9a-f]\{40\}\)".*/\1/p' Cargo.toml)"

@@ -57,9 +57,9 @@ case "$TMP" in "$REPO"/*) die "the temp dir is inside the repo" ;; esac
 cleanup() { if [ "${KEEP_TMP:-0}" = 1 ]; then echo "kept $TMP (it holds a test key)" >&2; else rm -rf "$TMP"; fi; }
 trap cleanup EXIT
 
-# the plugin's id and short, from the manifest this build prints
+# the plugin's id, short and publisher, from the manifest this build prints
 "$BIN" manifest >"$TMP/release.json"
-read -r PLUGIN_ID SHORT RELEASE_KEY_ID < <(node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log(m.id, m.short, m.publisher.key_id)' "$TMP/release.json")
+read -r PLUGIN_ID SHORT RELEASE_KEY_ID PUBLISHER_ID < <(node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log(m.id, m.short, m.publisher.key_id, m.publisher.id)' "$TMP/release.json")
 KEY_ID="${TEST_KEY_ID:-$SHORT-test-01}"
 [ "$KEY_ID" != "$RELEASE_KEY_ID" ] || die "the test key id must not be the release key id $RELEASE_KEY_ID"
 
@@ -73,7 +73,7 @@ cat >"$TMP/trust.json" <<JSON
 {
   "v": 1,
   "about": "Per-run trust store for $PLUGIN_ID conformance: a throwaway test key, never a release key.",
-  "publishers": { "$KEY_ID": { "publisher": "app.buwiz", "first_party": true, "alg": "ed25519", "public_key": "$PUB" } },
+  "publishers": { "$KEY_ID": { "publisher": "$PUBLISHER_ID", "first_party": true, "alg": "ed25519", "public_key": "$PUB" } },
   "approved_plugins": [ { "id": "$PLUGIN_ID", "publisher_key_id": "$KEY_ID" } ]
 }
 JSON

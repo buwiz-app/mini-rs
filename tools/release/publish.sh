@@ -30,9 +30,12 @@
 #   BUWIZ_BROKER_BIN   buwiz-broker from buwiz-bot/buwiz-bot (broker/): its
 #                      sign-manifest and manifest checks
 #   KEY_ID             the publisher key id to sign under (default: the
-#                      release key id); another id, such as a test key's,
-#                      goes into the manifest (and from it plugin.json) for
-#                      a local check, never with --publish
+#                      manifest's release key id). A new plugin's release key
+#                      id is "unassigned" until Buwiz assigns one at
+#                      submission: Buwiz releases it with KEY_ID=<that id>.
+#                      Another id, such as a test key's, goes into the
+#                      manifest (and from it plugin.json) for a local check,
+#                      never with --publish
 #   GH_REPO            default: this checkout's GitHub repo (gh repo view)
 set -euo pipefail
 
@@ -80,11 +83,12 @@ PLUGIN_ID="$(json m.id)"
 VERSION="$(json m.version)"
 RELEASE_KEY_ID="$(json m.publisher.key_id)"
 KEY_ID="${KEY_ID:-$RELEASE_KEY_ID}"
+[ "$KEY_ID" != unassigned ] || die "this plugin has no release key id yet: Buwiz assigns it at submission; set KEY_ID=<key id>"
 TAG="v$VERSION"
 if [ "$KEY_ID" != "$RELEASE_KEY_ID" ]; then
-  # a local check under another key id: the manifest names it, and
-  # `package` takes plugin.json's from the signed manifest
-  [ "$PUBLISH" = 0 ] || die "--publish signs under the release key id $RELEASE_KEY_ID only"
+  # another key id: the manifest names it, and `package` takes plugin.json's
+  # from the signed manifest (a local check, or the id Buwiz assigned)
+  [ "$PUBLISH" = 0 ] || [ "$RELEASE_KEY_ID" = unassigned ] || die "--publish signs under the release key id $RELEASE_KEY_ID only"
   "$BIN" manifest --key-id "$KEY_ID" >"$OUT/manifest.json"
 fi
 if [ -n "$KEY_FILE" ]; then SIGN=(--key-file "$KEY_FILE"); HOW="(a key file)"; else SIGN=(--keychain "$KEY_ID"); HOW="(approve the Keychain prompt)"; fi

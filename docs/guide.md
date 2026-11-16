@@ -19,12 +19,14 @@ signing key of your own (section 10).
 Click **Use this template** on GitHub (or clone it), then name your app:
 
 ```sh
-tools/new.sh notes "Notes"            # plugin id app.buwiz.notes
-tools/new.sh notes "Notes" com.example.notes
+tools/new.sh notes --id com.example.notes --publisher com.example "Example"
 ```
 
-It renames the crate, the plugin id, every `hello_*` tool, the `/hello` command and the screen id, writes a short
-README, then builds and tests. The rest of this guide calls the app Hello.
+The plugin id names your mini app and the publisher id names you; both are reverse DNS under a domain you own, and
+you pick them. The publisher name ("Example") is what users see next to your app. `new.sh` has no default for
+either, and refuses Buwiz's own namespace. It renames the crate, the plugin id, every `hello_*` tool, the `/hello`
+command and the screen id, writes a short README, then builds and tests. A new plugin's source holds no release key
+id: Buwiz assigns it at submission (section 10). The rest of this guide calls the app Hello.
 
 ## 2. What is where
 
@@ -95,7 +97,7 @@ Hello's screens are **native**: Rust, compiled into the Bot. An app entry in the
 `storage`, `copy` or `preview` if it needs them. The screen's code goes in `crates/hello-screens`, on the SDK's
 `buwiz-app` crate, and the Bot compiles it in.
 
-Native screens are for first-party publishers. Outside `app.buwiz`, ship TSX screens: see
+Native screens are for first-party publishers. Everyone else ships TSX screens: see
 [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
 
 ## 6. Add a routine
@@ -200,8 +202,9 @@ and one binary per platform, as flat GitHub release assets.
    takes `plugin.json`'s version, ids and publisher from the signed manifest.
 2. `tools/check-all.sh`.
 3. Submit the mini app to Buwiz for review. The way to submit isn't open yet.
-4. After review, Buwiz (the release key `gc-2026-01` for `app.buwiz` is in the Keychain) runs
-   `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build. It builds the binary, signs
+4. After review, Buwiz (its release key is in the Keychain) runs
+   `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build and `KEY_ID` set to the release
+   key id it assigned (a new plugin's source says `unassigned`). It builds the binary, signs
    the manifest as `<plugin id>.manifest.json`, has the binary's `package` command fill `package/plugin.json`
    (the version, ids and publisher from the signed manifest; the manifest at `bin/<plugin id>.manifest.json`
    and the binary at `bin/hello-mini-app`, each with its SHA-256),
