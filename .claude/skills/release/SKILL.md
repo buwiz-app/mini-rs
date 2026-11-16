@@ -5,6 +5,8 @@ description: Get a release of this mini app ready for Buwiz to review and sign â
 
 # Prepare a release
 
+Needs `BUWIZ_SDK_DIR` set to a buwiz-sdk checkout at the revision this repo pins, with `bun install` run there.
+
 A protocol 1.0 release is a package: `plugin.json` with a signed `buwiz` block, the signed manifest and one binary
 per platform, as GitHub release assets (`docs/guide.md` section 10).
 

@@ -9,7 +9,7 @@ You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
 reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
 package. The protocol is Buwiz Mini App Protocol 1.0
-([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/protocol-1.0.md)); the manifest declares `1.0.0`.
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
 
 You can build and test a mini app freely. Before it installs in the Bot, Buwiz reviews it and signs it, so you need no
 signing key of your own (section 10).
@@ -125,10 +125,13 @@ h.routine("tidy", "hello_tidy", json!({}));              // in a routine's turn
 Each returns `Ok(structuredContent)` or `Err({code, message})`.
 
 **Conformance** runs the SDK's checker against your release build: the manifest's grammar and limits, the
-signature, the reserved tools, sessions, signed calls, resolves. It needs a checkout of the SDK (and Node):
+signature, the reserved tools, sessions, signed calls, resolves. It needs Node (22.13 or newer) and bun, and a checkout of the SDK at the revision this repo pins, with its
+dependencies installed:
 
 ```sh
-git clone https://github.com/buwiz-app/buwiz-sdk && (cd buwiz-sdk && bun install)
+git clone https://github.com/buwiz-app/buwiz-sdk
+git -C buwiz-sdk checkout 317bae64f85947c94ce6d2efb7f2d9bdedc387a0
+(cd buwiz-sdk && bun install)
 BUWIZ_SDK_DIR=$PWD/buwiz-sdk tools/conformance.sh
 ```
 
@@ -151,9 +154,9 @@ Yours:
 - **Side effects behind explicit arguments** (P5), so a probe with `{}` changes nothing.
 - **Text without secrets.** A message, title or log carries no subject data and never the key (P4, P9).
 
-The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/security.md),
-[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/manifest.md) and
-[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/bridge.md).
+The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/security.md),
+[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/manifest.md) and
+[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/bridge.md).
 
 ## 9. Accounts
 

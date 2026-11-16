@@ -21,7 +21,7 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
    `Cargo.toml`, the one place: `package` fills `package/plugin.json`'s version, ids and publisher from the
    signed manifest. Tests sign with a throwaway test key id (`hello-test-01`); only Buwiz signs a release
    with the release key, from the Keychain. Agents never touch the Keychain.
-6. **One protocol version.** Protocol 1.0 (`1.0.0`) only.
+6. **One protocol version: 1.0** (the manifest's `protocol` is `1.0.0`). No shims for any other name or version.
 
 ## Gates
 

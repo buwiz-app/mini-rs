@@ -13,12 +13,13 @@
 #   6. run the runner, which spawns the binary the way the broker does.
 #
 # The release manifest keeps the release key id; only Buwiz signs it
-# (tools/release/publish.sh). Nothing here touches the Keychain or a Bot's
-# data folder.
+# (tools/release/publish.sh). Nothing here touches the Keychain or any
+# Bot data.
 #
 # Usage: tools/conformance.sh [runner args, e.g. --json]
 # Env:   BUWIZ_SDK_DIR  a buwiz-sdk checkout (https://github.com/buwiz-app/buwiz-sdk)
-#                       with its packages installed (bun install)
+#                       at the revision this repo pins (Cargo.toml), with its
+#                       dependencies installed (bun install)
 #        TEST_KEY_ID    the test key id (default <short>-test-01)
 #        KEEP_TMP=1     keep the temp dir (it holds a test key: delete it after)
 set -euo pipefail
@@ -32,8 +33,18 @@ SIGNER="$SDK/packages/conformance/src/v1/sign-manifest.mjs"
 die() { echo "conformance: $*" >&2; exit 2; }
 [ -n "$SDK" ] || die "set BUWIZ_SDK_DIR to a buwiz-sdk checkout (git clone https://github.com/buwiz-app/buwiz-sdk; cd buwiz-sdk; bun install)"
 for f in "$RUNNER" "$SIGNER"; do [ -f "$f" ] || die "$f not found: is BUWIZ_SDK_DIR a buwiz-sdk checkout?"; done
-[ -d "$SDK/packages/conformance/node_modules/@modelcontextprotocol/sdk" ] || die "the SDK's packages are not installed: cd $SDK && bun install"
+PIN="$(sed -n 's/^buwiz-plugin = .*rev = "\([0-9a-f]\{40\}\)".*/\1/p' "$REPO/Cargo.toml")"
+[ -n "$PIN" ] || die "no pinned buwiz-sdk revision found in Cargo.toml"
+HEAD_SHA="$(git -C "$SDK" rev-parse HEAD 2>/dev/null)" || die "$SDK is not a git checkout of buwiz-sdk"
+if [ "$HEAD_SHA" != "$PIN" ]; then
+  # the same files under another commit id (a merge of the pin) also pass
+  [ "$(git -C "$SDK" rev-parse "$PIN^{tree}" 2>/dev/null)" = "$(git -C "$SDK" rev-parse 'HEAD^{tree}')" ] ||
+    die "the SDK checkout is not the pinned revision $PIN: git -C \"\$BUWIZ_SDK_DIR\" fetch && git -C \"\$BUWIZ_SDK_DIR\" checkout $PIN"
+fi
+git -C "$SDK" diff --quiet HEAD -- packages/conformance || die "the SDK checkout has uncommitted changes under packages/conformance"
 command -v node >/dev/null || die "node is needed to run the SDK's tools"
+(cd "$SDK/packages/conformance" && node --input-type=module -e 'await import("esbuild"); await import("@modelcontextprotocol/sdk/client/index.js"); await import("@modelcontextprotocol/sdk/client/stdio.js")') >/dev/null 2>&1 ||
+  die "the SDK's runner cannot load its dependencies: run bun install in $SDK"
 
 # 1. the release binary
 cargo build --release --quiet --bin "$BIN_NAME" --manifest-path "$REPO/Cargo.toml"
