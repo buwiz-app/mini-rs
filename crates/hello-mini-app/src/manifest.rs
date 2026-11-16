@@ -9,12 +9,15 @@ use serde_json::{Value, json};
 
 use crate::tools;
 
-/// The plugin id. Buwiz's own mini apps are `app.buwiz.<name>`.
+/// The plugin id: reverse DNS under a domain the publisher owns.
 pub const ID: &str = "app.buwiz.hello";
 /// Every tool starts with `hello_`.
 pub const SHORT: &str = "hello";
 /// The name the user sees.
 pub const TITLE: &str = "Hello";
+/// The publisher id and the name users see.
+pub const PUBLISHER_ID: &str = "app.buwiz";
+pub const PUBLISHER_NAME: &str = "Buwiz";
 /// The publisher key a release is signed with. Only Buwiz signs.
 pub const RELEASE_KEY_ID: &str = "gc-2026-01";
 
@@ -27,7 +30,7 @@ pub fn unsigned(key_id: &str) -> Value {
         "version": env!("CARGO_PKG_VERSION"),
         "title": TITLE,
         "description": "The mini-rs template: one tool, one command, one scope and one native screen.",
-        "publisher": { "id": "app.buwiz", "key_id": key_id, "name": "Buwiz" },
+        "publisher": { "id": PUBLISHER_ID, "key_id": key_id, "name": PUBLISHER_NAME },
         "commands": [
             { "name": SHORT, "args": "[name]", "description": format!("Open {TITLE}, optionally for a friend"), "resolve": tools::RESOLVE }
         ],

@@ -1,4 +1,4 @@
-//! Hello, the mini-rs template's mini app (`app.buwiz.hello`).
+//! Hello, a Buwiz Bot mini app (`app.buwiz.hello`).
 //!
 //! The SDK (`buwiz-plugin`) serves MCP, answers the reserved `buwiz.*`
 //! tools and checks every caller; this crate holds only what is Hello's:

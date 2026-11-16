@@ -9,7 +9,10 @@ You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
 reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
 package. The protocol is Buwiz Mini App Protocol 1.0
-([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
+
+The native screen in this repo runs in Buwiz Bot only for Buwiz's own plugins (publisher `app.buwiz`). Every other
+publisher starts from [mini-tsx](https://github.com/buwiz-app/mini-tsx), which has TSX screens.
 
 You can build and test a mini app freely. Before it installs in the Bot, Buwiz reviews it and signs it, so you need no
 signing key of your own (section 10).
@@ -19,12 +22,15 @@ signing key of your own (section 10).
 Click **Use this template** on GitHub (or clone it), then name your app:
 
 ```sh
-tools/new.sh notes "Notes"            # plugin id app.buwiz.notes
-tools/new.sh notes "Notes" com.example.notes
+tools/new.sh notes --first-party --id app.buwiz.notes --publisher app.buwiz "Buwiz"
 ```
 
-It renames the crate, the plugin id, every `hello_*` tool, the `/hello` command and the screen id, writes a short
-README, then builds and tests. The rest of this guide calls the app Hello.
+`new.sh` needs `--first-party`, and refuses anything else. The plugin id is `app.buwiz.<name>` (3 to 8
+dot-separated labels in general; the SDK's grammar) and the publisher id is `app.buwiz`; the publisher name is what
+users see next to your app, and `--title` and `--description` set the app's name and description (default: the
+short, capitalised, and the title). It renames the crate, the plugin id, every `hello_*` tool, the `/hello`
+command and the screen id, writes a short README and NOTICE, builds, formats and tests, and last removes itself and
+`tools/test-new.sh`, which are about this repo, not your app. The rest of this guide calls the app Hello.
 
 ## 2. What is where
 
@@ -35,7 +41,7 @@ README, then builds and tests. The rest of this guide calls the app Hello.
 | `crates/hello-mini-app/src/lib.rs` | `Hello`: the state (tickets, your store) and the `Plugin` impl that ties it together |
 | `crates/hello-mini-app/src/main.rs` | One line: the SDK's command line |
 | `crates/hello-screens/` | Native screens, on the SDK's `buwiz-app` crate ([its README](../crates/hello-screens/README.md)) |
-| `package/plugin.json` | The package template a release fills and signs (section 10) |
+| `package/plugin.json` | The package's `plugin.json`, which a release fills and signs (section 10) |
 | `tests/` | Integration tests, through the SDK's harness |
 | `tools/` | `check-all.sh` (every gate), `conformance.sh`, `release/publish.sh`, `new.sh` |
 
@@ -95,7 +101,7 @@ Hello's screens are **native**: Rust, compiled into the Bot. An app entry in the
 `storage`, `copy` or `preview` if it needs them. The screen's code goes in `crates/hello-screens`, on the SDK's
 `buwiz-app` crate, and the Bot compiles it in.
 
-Native screens are for first-party publishers. Outside `app.buwiz`, ship TSX screens: see
+Native screens are for first-party publishers. Everyone else ships TSX screens: see
 [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
 
 ## 6. Add a routine
@@ -130,7 +136,7 @@ dependencies installed:
 
 ```sh
 git clone https://github.com/buwiz-app/buwiz-sdk
-git -C buwiz-sdk checkout 317bae64f85947c94ce6d2efb7f2d9bdedc387a0
+git -C buwiz-sdk checkout e1de9c4487de6a9b6509e53ed1e990d699cad454
 (cd buwiz-sdk && bun install)
 BUWIZ_SDK_DIR=$PWD/buwiz-sdk tools/conformance.sh
 ```
@@ -154,9 +160,9 @@ Yours:
 - **Side effects behind explicit arguments** (P5), so a probe with `{}` changes nothing.
 - **Text without secrets.** A message, title or log carries no subject data and never the key (P4, P9).
 
-The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/security.md),
-[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/manifest.md) and
-[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/bridge.md).
+The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/security.md),
+[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/manifest.md) and
+[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/bridge.md).
 
 ## 9. Accounts
 
@@ -200,8 +206,9 @@ and one binary per platform, as flat GitHub release assets.
    takes `plugin.json`'s version, ids and publisher from the signed manifest.
 2. `tools/check-all.sh`.
 3. Submit the mini app to Buwiz for review. The way to submit isn't open yet.
-4. After review, Buwiz (the release key `gc-2026-01` for `app.buwiz` is in the Keychain) runs
-   `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build. It builds the binary, signs
+4. After review, Buwiz (its release key is in the Keychain) runs
+   `tools/release/publish.sh` with `BUWIZ_BROKER_BIN` set to a `buwiz-broker` build and `KEY_ID` set to the release
+   key id it assigned (a new plugin's source says `unassigned`). It builds the binary, signs
    the manifest as `<plugin id>.manifest.json`, has the binary's `package` command fill `package/plugin.json`
    (the version, ids and publisher from the signed manifest; the manifest at `bin/<plugin id>.manifest.json`
    and the binary at `bin/hello-mini-app`, each with its SHA-256),

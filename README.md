@@ -4,8 +4,12 @@ A template for a Buwiz Bot mini app in Rust, with native Rust screens, on Buwiz 
 build: the protocol comes from [buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), so the template holds only
 what is yours.
 
+This template has a native screen, which Buwiz Bot runs only for Buwiz's own plugins, so `tools/new.sh` needs
+`--first-party`. Every other publisher starts from [mini-tsx](https://github.com/buwiz-app/mini-tsx), which has TSX
+screens.
+
 ```sh
-tools/new.sh notes "Notes"     # name it: app.buwiz.notes, notes_* tools, /notes
+tools/new.sh notes --first-party --id app.buwiz.notes --publisher app.buwiz "Buwiz"   # notes_* tools, /notes
 cargo test                     # your tests, through the SDK's harness
 tools/check-all.sh             # every gate, the SDK's conformance runner included
 ```
@@ -13,21 +17,18 @@ tools/check-all.sh             # every gate, the SDK's conformance runner includ
 The example app, Hello, has one tool (`hello_greet`), a `/hello` command and an `@hello:friend` scope (one resolve
 tool, `hello_resolve`), and one native screen (`hello.home`).
 
-The native screen makes this template a fit for Buwiz's own mini apps only. For anything else, start from
-[mini-tsx](https://github.com/buwiz-app/mini-tsx).
-
 | Path | What |
 |---|---|
 | `crates/hello-mini-app/` | The mini app: `manifest.rs`, `tools.rs`, and the `Plugin` impl in `lib.rs` |
 | `crates/hello-screens/` | Native `hello.home` screen and fake-host tests |
 | `tests/` | Integration tests |
-| `package/plugin.json` | The package template a release fills and signs (protocol 1.0 section 7) |
+| `package/plugin.json` | The package's `plugin.json`, which a release fills and signs (protocol 1.0 section 7) |
 | `tools/` | `new.sh`, `check-all.sh`, `conformance.sh`, `release/publish.sh` |
 | `docs/guide.md` | The walkthrough: tools, commands and scopes, screens, routines, tests, release |
 | `.claude/skills/` | Skills for coding agents: add a tool, a command or scope, a screen; release |
 
 Want TSX screens, or TypeScript throughout? Use [buwiz-app/mini-tsx](https://github.com/buwiz-app/mini-tsx).
-Native screens are for first-party (`app.buwiz`) mini apps; every other mini app uses TSX.
+Native screens are for Buwiz's own mini apps; every other mini app uses TSX.
 
 Anyone can build a mini app, but the Bot installs only mini apps Buwiz has signed: once submission opens, you send yours to Buwiz, which
 reviews it and signs it. The way to submit isn't open yet ([docs/guide.md](docs/guide.md) section 10).
