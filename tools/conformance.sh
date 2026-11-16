@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tools/bot/conformance.sh — run the Buwiz Bot's conformance runner
+# tools/conformance.sh — run the SDK's conformance runner
 # (buwiz-plugin-test) against this mini app's release build:
 #
 #   1. build the release binary;
@@ -9,31 +9,31 @@
 #      key id, marked first_party (native screens are for first-party keys
 #      only), with this plugin approved under it;
 #   5. print the manifest under the test key id and sign it with the test
-#      key (sign-manifest.mjs --key-file);
+#      key (the SDK's sign-manifest.mjs --key-file);
 #   6. run the runner, which spawns the binary the way the broker does.
 #
 # The release manifest keeps the release key id; only Buwiz signs it
 # (tools/release/publish.sh). Nothing here touches the Keychain or a Bot's
 # data folder.
 #
-# Usage: tools/bot/conformance.sh [runner args, e.g. --json]
-# Env:   BUWIZ_BOT_DIR  a buwiz-bot checkout (https://github.com/buwiz-bot/buwiz-bot)
-#                       with its server/node_modules installed (cd server && npm ci)
+# Usage: tools/conformance.sh [runner args, e.g. --json]
+# Env:   BUWIZ_SDK_DIR  a buwiz-sdk checkout (https://github.com/buwiz-app/buwiz-sdk)
+#                       with its packages installed (bun install)
 #        TEST_KEY_ID    the test key id (default <short>-test-01)
 #        KEEP_TMP=1     keep the temp dir (it holds a test key: delete it after)
 set -euo pipefail
 
 BIN_NAME="hello-mini-app"
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-BOT="${BUWIZ_BOT_DIR:-}"
-RUNNER="$BOT/server/sdk/mini-app/bin/buwiz-plugin-test.mjs"
-SIGNER="$BOT/server/src/v1/sign-manifest.mjs"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SDK="${BUWIZ_SDK_DIR:-}"
+RUNNER="$SDK/packages/conformance/bin/buwiz-plugin-test.mjs"
+SIGNER="$SDK/packages/conformance/src/v1/sign-manifest.mjs"
 
 die() { echo "conformance: $*" >&2; exit 2; }
-[ -n "$BOT" ] || die "set BUWIZ_BOT_DIR to a buwiz-bot checkout (git clone https://github.com/buwiz-bot/buwiz-bot; cd buwiz-bot/server; npm ci)"
-for f in "$RUNNER" "$SIGNER"; do [ -f "$f" ] || die "$f not found: is BUWIZ_BOT_DIR a buwiz-bot checkout on protocol 1.0?"; done
-[ -d "$BOT/server/node_modules/@modelcontextprotocol/sdk" ] || die "the Bot's server/node_modules is missing: cd $BOT/server && npm ci"
-command -v node >/dev/null || die "node is needed to run the Bot's tools"
+[ -n "$SDK" ] || die "set BUWIZ_SDK_DIR to a buwiz-sdk checkout (git clone https://github.com/buwiz-app/buwiz-sdk; cd buwiz-sdk; bun install)"
+for f in "$RUNNER" "$SIGNER"; do [ -f "$f" ] || die "$f not found: is BUWIZ_SDK_DIR a buwiz-sdk checkout?"; done
+[ -d "$SDK/packages/conformance/node_modules/@modelcontextprotocol/sdk" ] || die "the SDK's packages are not installed: cd $SDK && bun install"
+command -v node >/dev/null || die "node is needed to run the SDK's tools"
 
 # 1. the release binary
 cargo build --release --quiet --bin "$BIN_NAME" --manifest-path "$REPO/Cargo.toml"
@@ -76,10 +76,9 @@ for id in $(node -e 'for (const a of JSON.parse(require("fs").readFileSync(proce
   "$BIN" app-source "$id" >"$TMP/app-$id.tsx"
   APP_ARGS+=(--app "$id=$TMP/app-$id.tsx")
 done
-(cd "$BOT/server" && node "$SIGNER" "$TMP/manifest.json" --key-file "$TMP/test.key" ${APP_ARGS[@]+"${APP_ARGS[@]}"} --out "$TMP/signed.json")
+node "$SIGNER" "$TMP/manifest.json" --key-file "$TMP/test.key" ${APP_ARGS[@]+"${APP_ARGS[@]}"} --out "$TMP/signed.json"
 
 # 6. the runner: it serves the signed manifest through BUWIZ_PLUGIN_MANIFEST
-cd "$BOT/server"
 node --disable-warning=ExperimentalWarning "$RUNNER" \
   --command "$BIN" --args mcp \
   --manifest "$TMP/signed.json" --key-file "$TMP/test.key" "$@"

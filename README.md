@@ -7,7 +7,7 @@ what is yours.
 ```sh
 tools/new.sh notes "Notes"     # name it: app.buwiz.notes, notes_* tools, /notes
 cargo test                     # your tests, through the SDK's harness
-tools/check-all.sh             # every gate, the Bot's conformance runner included
+tools/check-all.sh             # every gate, the SDK's conformance runner included
 ```
 
 The example app, Hello, has one tool (`hello_greet`), a `/hello` command and an `@hello:friend` scope (one resolve
@@ -22,7 +22,7 @@ The native screen makes this template a fit for Buwiz's own mini apps only. For 
 | `crates/hello-screens/` | Native `hello.home` screen and fake-host tests |
 | `tests/` | Integration tests |
 | `package/plugin.json` | The package template a release fills and signs (protocol 1.0 section 7) |
-| `tools/` | `new.sh`, `check-all.sh`, `bot/conformance.sh`, `release/publish.sh` |
+| `tools/` | `new.sh`, `check-all.sh`, `conformance.sh`, `release/publish.sh` |
 | `docs/guide.md` | The walkthrough: tools, commands and scopes, screens, routines, tests, release |
 | `.claude/skills/` | Skills for coding agents: add a tool, a command or scope, a screen; release |
 
