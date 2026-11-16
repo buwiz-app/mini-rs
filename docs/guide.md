@@ -11,6 +11,9 @@ reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, 
 package. The protocol is Buwiz Mini App Protocol 1.0
 ([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
 
+The native screen in this repo runs in Buwiz Bot only for Buwiz's own plugins (publisher `app.buwiz`). Every other
+publisher starts from [mini-tsx](https://github.com/buwiz-app/mini-tsx), which has TSX screens.
+
 You can build and test a mini app freely. Before it installs in the Bot, Buwiz reviews it and signs it, so you need no
 signing key of your own (section 10).
 
@@ -19,14 +22,15 @@ signing key of your own (section 10).
 Click **Use this template** on GitHub (or clone it), then name your app:
 
 ```sh
-tools/new.sh notes --id com.example.notes --publisher com.example "Example"
+tools/new.sh notes --first-party --id app.buwiz.notes --publisher app.buwiz "Buwiz"
 ```
 
-The plugin id names your mini app and the publisher id names you; both are reverse DNS under a domain you own, and
-you pick them. The publisher name ("Example") is what users see next to your app. `new.sh` has no default for
-either, and refuses Buwiz's own namespace. It renames the crate, the plugin id, every `hello_*` tool, the `/hello`
-command and the screen id, writes a short README, then builds and tests. A new plugin's source holds no release key
-id: Buwiz assigns it at submission (section 10). The rest of this guide calls the app Hello.
+`new.sh` needs `--first-party`, and refuses anything else. The plugin id is `app.buwiz.<name>` (3 to 8
+dot-separated labels in general; the SDK's grammar) and the publisher id is `app.buwiz`; the publisher name is what
+users see next to your app, and `--title` and `--description` set the app's name and description (default: the
+short, capitalised, and the title). It renames the crate, the plugin id, every `hello_*` tool, the `/hello`
+command and the screen id, writes a short README and NOTICE, builds, formats and tests, and last removes itself and
+`tools/test-new.sh`, which are about this repo, not your app. The rest of this guide calls the app Hello.
 
 ## 2. What is where
 
@@ -37,7 +41,7 @@ id: Buwiz assigns it at submission (section 10). The rest of this guide calls th
 | `crates/hello-mini-app/src/lib.rs` | `Hello`: the state (tickets, your store) and the `Plugin` impl that ties it together |
 | `crates/hello-mini-app/src/main.rs` | One line: the SDK's command line |
 | `crates/hello-screens/` | Native screens, on the SDK's `buwiz-app` crate ([its README](../crates/hello-screens/README.md)) |
-| `package/plugin.json` | The package template a release fills and signs (section 10) |
+| `package/plugin.json` | The package's `plugin.json`, which a release fills and signs (section 10) |
 | `tests/` | Integration tests, through the SDK's harness |
 | `tools/` | `check-all.sh` (every gate), `conformance.sh`, `release/publish.sh`, `new.sh` |
 

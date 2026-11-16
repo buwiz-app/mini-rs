@@ -33,9 +33,13 @@
 #                      manifest's release key id). A new plugin's release key
 #                      id is "unassigned" until Buwiz assigns one at
 #                      submission: Buwiz releases it with KEY_ID=<that id>.
-#                      Another id, such as a test key's, goes into the
-#                      manifest (and from it plugin.json) for a local check,
-#                      never with --publish
+#                      --publish refuses the key id "unassigned", the plugin's
+#                      test key id (<short>-test-01) and any id that matches
+#                      *-test-NN, before it looks for the broker or builds;
+#                      and, once a release key id is assigned, any id but that
+#                      one. Without --publish another id, such as a test
+#                      key's, goes into the manifest (and from it plugin.json)
+#                      for a local check.
 #   GH_REPO            default: this checkout's GitHub repo (gh repo view)
 set -euo pipefail
 
@@ -57,6 +61,21 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+
+# the key rules, from the source, before anything is built or looked for
+SRC="crates/$BIN_NAME/src/manifest.rs"
+SRC_SHORT="$(sed -n 's/^pub const SHORT: &str = "\(.*\)";$/\1/p' "$REPO/$SRC")"
+SRC_RELEASE_KEY_ID="$(sed -n 's/^pub const RELEASE_KEY_ID: &str = "\(.*\)";$/\1/p' "$REPO/$SRC")"
+[ -n "$SRC_SHORT" ] && [ -n "$SRC_RELEASE_KEY_ID" ] || die "cannot read SHORT and RELEASE_KEY_ID from $SRC"
+KEY_ID="${KEY_ID:-$SRC_RELEASE_KEY_ID}"
+[ "$KEY_ID" != unassigned ] || die "this plugin has no release key id yet: Buwiz assigns it at submission; set KEY_ID=<key id>"
+if [ "$PUBLISH" = 1 ]; then
+  case "$KEY_ID" in
+    "$SRC_SHORT-test-01" | *-test-[0-9]*) die "--publish never signs under a test key id ($KEY_ID); set KEY_ID to the release key id" ;;
+  esac
+  [ "$SRC_RELEASE_KEY_ID" = unassigned ] || [ "$KEY_ID" = "$SRC_RELEASE_KEY_ID" ] ||
+    die "--publish signs under the release key id $SRC_RELEASE_KEY_ID only"
+fi
 BROKER="${BUWIZ_BROKER_BIN:-}"
 [ -x "$BROKER" ] || die "set BUWIZ_BROKER_BIN to a buwiz-broker build (buwiz-bot/buwiz-bot broker/)"
 [ "$PUBLISH" = 1 ] || [ ${#PRERELEASE[@]} = 0 ] || die "--prerelease needs --publish"
@@ -82,13 +101,11 @@ json() { node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1
 PLUGIN_ID="$(json m.id)"
 VERSION="$(json m.version)"
 RELEASE_KEY_ID="$(json m.publisher.key_id)"
-KEY_ID="${KEY_ID:-$RELEASE_KEY_ID}"
-[ "$KEY_ID" != unassigned ] || die "this plugin has no release key id yet: Buwiz assigns it at submission; set KEY_ID=<key id>"
+[ "$RELEASE_KEY_ID" = "$SRC_RELEASE_KEY_ID" ] || die "the built manifest's release key id $RELEASE_KEY_ID is not $SRC's $SRC_RELEASE_KEY_ID"
 TAG="v$VERSION"
 if [ "$KEY_ID" != "$RELEASE_KEY_ID" ]; then
   # another key id: the manifest names it, and `package` takes plugin.json's
   # from the signed manifest (a local check, or the id Buwiz assigned)
-  [ "$PUBLISH" = 0 ] || [ "$RELEASE_KEY_ID" = unassigned ] || die "--publish signs under the release key id $RELEASE_KEY_ID only"
   "$BIN" manifest --key-id "$KEY_ID" >"$OUT/manifest.json"
 fi
 if [ -n "$KEY_FILE" ]; then SIGN=(--key-file "$KEY_FILE"); HOW="(a key file)"; else SIGN=(--keychain "$KEY_ID"); HOW="(approve the Keychain prompt)"; fi

@@ -6,8 +6,9 @@
 #   2. make a fresh 0700 temp dir outside the repo;
 #   3. make a throwaway ed25519 test key (buwiz-plugin-test --keygen);
 #   4. write a per-run trust store (BUWIZ_TRUST_FILE): that key under a TEST
-#      key id, marked first_party (native screens are for first-party keys
-#      only), with this plugin approved under it;
+#      key id, with this plugin approved under it, and marked first_party only
+#      when its publisher is app.buwiz (native screens are for first-party keys
+#      only: any other publisher's native screen fails here, as in the Bot);
 #   5. print the manifest under the test key id and sign it with the test
 #      key (the SDK's sign-manifest.mjs --key-file);
 #   6. run the runner, which spawns the binary the way the broker does.
@@ -33,18 +34,18 @@ SIGNER="$SDK/packages/conformance/src/v1/sign-manifest.mjs"
 die() { echo "conformance: $*" >&2; exit 2; }
 [ -n "$SDK" ] || die "set BUWIZ_SDK_DIR to a buwiz-sdk checkout (git clone https://github.com/buwiz-app/buwiz-sdk; cd buwiz-sdk; bun install)"
 for f in "$RUNNER" "$SIGNER"; do [ -f "$f" ] || die "$f not found: is BUWIZ_SDK_DIR a buwiz-sdk checkout?"; done
-PIN="$(sed -n 's/^buwiz-plugin = .*rev = "\([0-9a-f]\{40\}\)".*/\1/p' "$REPO/Cargo.toml")"
-[ -n "$PIN" ] || die "no pinned buwiz-sdk revision found in Cargo.toml"
-HEAD_SHA="$(git -C "$SDK" rev-parse HEAD 2>/dev/null)" || die "$SDK is not a git checkout of buwiz-sdk"
-if [ "$HEAD_SHA" != "$PIN" ]; then
-  # the same files under another commit id (a merge of the pin) also pass
-  [ "$(git -C "$SDK" rev-parse "$PIN^{tree}" 2>/dev/null)" = "$(git -C "$SDK" rev-parse 'HEAD^{tree}')" ] ||
-    die "the SDK checkout is not the pinned revision $PIN: git -C \"\$BUWIZ_SDK_DIR\" fetch && git -C \"\$BUWIZ_SDK_DIR\" checkout $PIN"
-fi
-git -C "$SDK" diff --quiet HEAD -- packages/conformance || die "the SDK checkout has uncommitted changes under packages/conformance"
+# the pin, with Cargo.toml, the crates' manifests and Cargo.lock agreeing on it
+PIN="$("$REPO/tools/sdk-pin.sh")"
+git -C "$SDK" rev-parse --git-dir >/dev/null 2>&1 || die "$SDK is not a git checkout of buwiz-sdk"
+# the same files as the pin (a merge of the pin has another commit id and passes)
+[ "$(git -C "$SDK" rev-parse "$PIN^{tree}" 2>/dev/null)" = "$(git -C "$SDK" rev-parse 'HEAD^{tree}')" ] ||
+  die "the SDK checkout is not the pinned revision $PIN: git -C \"\$BUWIZ_SDK_DIR\" fetch && git -C \"\$BUWIZ_SDK_DIR\" checkout $PIN"
+[ -z "$(git -C "$SDK" status --porcelain --untracked-files=all -- packages/conformance)" ] ||
+  die "the SDK checkout has uncommitted or untracked files under packages/conformance"
 command -v node >/dev/null || die "node is needed to run the SDK's tools"
-(cd "$SDK/packages/conformance" && node --input-type=module -e 'await import("esbuild"); await import("@modelcontextprotocol/sdk/client/index.js"); await import("@modelcontextprotocol/sdk/client/stdio.js")') >/dev/null 2>&1 ||
-  die "the SDK's runner cannot load its dependencies: run bun install in $SDK"
+NODE_MIN="$(node -p 'require(process.argv[1]).engines.node' "$SDK/packages/conformance/package.json" 2>/dev/null || true)"
+(cd "$SDK/packages/conformance" && node --input-type=module -e 'await import("node:sqlite"); await import("esbuild"); await import("@modelcontextprotocol/sdk/client/index.js"); await import("@modelcontextprotocol/sdk/client/stdio.js")') >/dev/null 2>&1 ||
+  die "the SDK's runner cannot start: it needs Node ${NODE_MIN:-(see packages/conformance/package.json engines)} (this is $(node -v)) and its dependencies (run bun install in $SDK)"
 
 # 1. the release binary
 cargo build --release --quiet --bin "$BIN_NAME" --manifest-path "$REPO/Cargo.toml"
@@ -68,12 +69,14 @@ node "$RUNNER" --keygen "$TMP/test.key" >"$TMP/keygen.txt"
 PUB="$(sed -n 's/.*Public key: \([A-Za-z0-9_-]*\).*/\1/p' "$TMP/keygen.txt")"
 [ -n "$PUB" ] || die "keygen printed no public key"
 
-# 4. the per-run trust store: the test key id only
+# 4. the per-run trust store: the test key id only; first-party only for Buwiz's own publisher
+FIRST_PARTY=
+[ "$PUBLISHER_ID" != app.buwiz ] || FIRST_PARTY='"first_party": true, '
 cat >"$TMP/trust.json" <<JSON
 {
   "v": 1,
   "about": "Per-run trust store for $PLUGIN_ID conformance: a throwaway test key, never a release key.",
-  "publishers": { "$KEY_ID": { "publisher": "$PUBLISHER_ID", "first_party": true, "alg": "ed25519", "public_key": "$PUB" } },
+  "publishers": { "$KEY_ID": { "publisher": "$PUBLISHER_ID", ${FIRST_PARTY}"alg": "ed25519", "public_key": "$PUB" } },
   "approved_plugins": [ { "id": "$PLUGIN_ID", "publisher_key_id": "$KEY_ID" } ]
 }
 JSON

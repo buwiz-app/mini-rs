@@ -1,9 +1,9 @@
 # AGENTS.md
 
-A Buwiz Bot mini app in Rust (Buwiz Mini App Protocol 1.0), made from the `buwiz-app/mini-rs` template. The SDK
+A Buwiz Bot mini app in Rust (Buwiz Mini App Protocol 1.0), made from `buwiz-app/mini-rs`. The SDK
 (`buwiz-plugin`, from `buwiz-app/buwiz-sdk`, pinned by rev in the root `Cargo.toml`) does the protocol; this repo
-holds the manifest (`src/manifest.rs`), the tools (`src/tools.rs`), the screens and the package template
-(`package/plugin.json`). `docs/guide.md` is the reference for every part.
+holds the manifest (`src/manifest.rs`), the tools (`src/tools.rs`), the screens and the package's
+`plugin.json` (`package/plugin.json`). `docs/guide.md` is the reference for every part.
 
 Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, `release`.
 

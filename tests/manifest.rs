@@ -38,7 +38,7 @@ fn every_screen_is_native() {
 }
 
 #[test]
-fn the_package_template_names_its_server() {
+fn the_package_json_names_its_server() {
     // package/plugin.json, which `tools/release/publish.sh` fills from the
     // signed manifest and signs
     let plugin: serde_json::Value =
