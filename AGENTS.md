@@ -11,7 +11,7 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
 
 1. **The manifest declares everything.** A tool a screen calls is in that app's `permissions.tools`; a resolve or
    routine query names a read-only tool; a routine's write is in its `writes`. `tests/manifest.rs` runs the SDK's
-   quick check; conformance runs the Bot's full one.
+   quick check; conformance runs the SDK's full one.
 2. **Tools start with the manifest's `short` and `_`**, and say `read_only: true` unless they change data.
 3. **Tickets, not identifiers.** A subject leaves the process only as a ticket. A tool refuses a ticket it did not
    issue (P1); a ticket's title never reveals its subject.
@@ -21,10 +21,10 @@ Skills, by task: `add-tool`, `add-command` (commands and scopes), `add-screen`, 
    `Cargo.toml`, the one place: `package` fills `package/plugin.json`'s version, ids and publisher from the
    signed manifest. Tests sign with a throwaway test key id (`hello-test-01`); only Buwiz signs a release
    with the release key, from the Keychain. Agents never touch the Keychain.
-6. **One protocol version.** Protocol 1.0 (`1.0.0`) only. No shims for older protocol names or versions.
+6. **One protocol version: 1.0** (the manifest's `protocol` is `1.0.0`). No shims for any other name or version.
 
 ## Gates
 
 `tools/check-all.sh` passes before every commit: `cargo fmt --check`, `cargo clippy --all-targets -D warnings`,
-`cargo test`, and `tools/bot/conformance.sh`, which needs a buwiz-bot checkout in `BUWIZ_BOT_DIR` (`docs/guide.md`
-section 7). `SKIP_BOT=1` skips conformance and fails the run, so a skip never reads as a pass.
+`cargo test`, and `tools/conformance.sh`, which needs a buwiz-sdk checkout in `BUWIZ_SDK_DIR` (`docs/guide.md`
+section 7). `SKIP_CONFORMANCE=1` skips conformance and fails the run, so a skip never reads as a pass.

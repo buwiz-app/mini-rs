@@ -1,9 +1,8 @@
 //! Hello's manifest, built in code. The version is the crate's, so a
 //! release bumps one number.
 //!
-//! The field rules and limits are the Bot's
-//! (`server/sdk/mini-app/docs/manifest.md`); `tools/bot/conformance.sh`
-//! checks them all.
+//! The field rules and limits are the SDK's
+//! (`docs/manifest.md` in buwiz-sdk); `tools/conformance.sh` checks them all.
 
 use buwiz_plugin::manifest::{NATIVE_ABI, PROTOCOL};
 use serde_json::{Value, json};

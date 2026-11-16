@@ -9,7 +9,7 @@ You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
 reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
 package. The protocol is Buwiz Mini App Protocol 1.0
-([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/main/docs/protocol-1.0.md)); the manifest declares `1.0.0`.
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
 
 You can build and test a mini app freely. Before it installs in the Bot, Buwiz reviews it and signs it, so you need no
 signing key of your own (section 10).
@@ -37,7 +37,7 @@ README, then builds and tests. The rest of this guide calls the app Hello.
 | `crates/hello-screens/` | Native screens, on the SDK's `buwiz-app` crate ([its README](../crates/hello-screens/README.md)) |
 | `package/plugin.json` | The package template a release fills and signs (section 10) |
 | `tests/` | Integration tests, through the SDK's harness |
-| `tools/` | `check-all.sh` (every gate), `bot/conformance.sh`, `release/publish.sh`, `new.sh` |
+| `tools/` | `check-all.sh` (every gate), `conformance.sh`, `release/publish.sh`, `new.sh` |
 
 The binary's command line comes from the SDK:
 
@@ -124,12 +124,15 @@ h.routine("tidy", "hello_tidy", json!({}));              // in a routine's turn
 
 Each returns `Ok(structuredContent)` or `Err({code, message})`.
 
-**Conformance** runs the Bot's own checker against your release build: the manifest's grammar and limits, the
-signature, the reserved tools, sessions, signed calls, resolves. It needs a checkout of the Bot:
+**Conformance** runs the SDK's checker against your release build: the manifest's grammar and limits, the
+signature, the reserved tools, sessions, signed calls, resolves. It needs Node (22.13 or newer) and bun, and a checkout of the SDK at the revision this repo pins, with its
+dependencies installed:
 
 ```sh
-git clone https://github.com/buwiz-bot/buwiz-bot && (cd buwiz-bot/server && npm ci)
-BUWIZ_BOT_DIR=$PWD/buwiz-bot tools/bot/conformance.sh
+git clone https://github.com/buwiz-app/buwiz-sdk
+git -C buwiz-sdk checkout 317bae64f85947c94ce6d2efb7f2d9bdedc387a0
+(cd buwiz-sdk && bun install)
+BUWIZ_SDK_DIR=$PWD/buwiz-sdk tools/conformance.sh
 ```
 
 It signs with a throwaway key under a test key id, never the release key. Every row must pass.
@@ -151,9 +154,9 @@ Yours:
 - **Side effects behind explicit arguments** (P5), so a probe with `{}` changes nothing.
 - **Text without secrets.** A message, title or log carries no subject data and never the key (P4, P9).
 
-The full rules: the Bot's [security checklist](https://github.com/buwiz-bot/buwiz-bot/blob/main/server/sdk/mini-app/docs/security.md),
-[manifest reference](https://github.com/buwiz-bot/buwiz-bot/blob/main/server/sdk/mini-app/docs/manifest.md) and
-[bridge](https://github.com/buwiz-bot/buwiz-bot/blob/main/server/sdk/mini-app/docs/bridge.md).
+The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/security.md),
+[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/manifest.md) and
+[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/317bae64f85947c94ce6d2efb7f2d9bdedc387a0/docs/bridge.md).
 
 ## 9. Accounts
 

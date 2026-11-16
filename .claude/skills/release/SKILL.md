@@ -5,6 +5,8 @@ description: Get a release of this mini app ready for Buwiz to review and sign â
 
 # Prepare a release
 
+Needs `BUWIZ_SDK_DIR` set to a buwiz-sdk checkout at the revision this repo pins, with `bun install` run there.
+
 A protocol 1.0 release is a package: `plugin.json` with a signed `buwiz` block, the signed manifest and one binary
 per platform, as GitHub release assets (`docs/guide.md` section 10).
 
@@ -14,8 +16,8 @@ per platform, as GitHub release assets (`docs/guide.md` section 10).
 2. **Pass every gate:** `tools/check-all.sh`, conformance included, with no row failing beyond what `AGENTS.md`
    names as known.
 3. **Check the package locally**, with a throwaway key under a test key id, never the release key: make the key
-   with the Bot's `buwiz-plugin-test --keygen` in a fresh 0700 temp dir outside the repo, write a trust store
-   for it (as `tools/bot/conformance.sh` does), then
+   with the SDK's `buwiz-plugin-test --keygen` in a fresh 0700 temp dir outside the repo, write a trust store
+   for it (as `tools/conformance.sh` does), then
    `KEY_ID=<short>-test-01 BUWIZ_BROKER_BIN=<buwiz-broker> tools/release/publish.sh --key-file <key> --trust <trust.json>`.
    Delete the temp dir after.
 4. **Hand over.** The mini app goes to Buwiz for review; the way to submit isn't open yet. After review Buwiz runs,
