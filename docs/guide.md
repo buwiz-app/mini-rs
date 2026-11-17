@@ -62,10 +62,10 @@ hello-mini-app package <plugin.json> <out> <platform> [--published <plugin.json>
    `read_only: true` unless it changes data.
 2. Add its arm to `call()`. Answer `ok(json!({…}))`, or `fail(code, message)` with a code such as `not_found` or
    `invalid_args` and a message the user can read.
-3. A screen that calls it lists it in its app's `permissions.tools` in `manifest.rs`; the model can call any tool unless its audience leaves out `"agent"`, and a generated widget only one that lists `"widget"` ([16.4](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)).
+3. A screen that calls it lists it in its app's `permissions.tools` in `manifest.rs`; who else may call it is in section 8.
 4. Test it in `tests/` through the harness (section 7).
 
-The SDK refuses a call before it reaches you when the caller may not make it (a call through an app that does not list the tool; a write from a resolve, a routine's query or a caller of an origin it does not know; [who calls](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md), 16.1). What it cannot know is
+The SDK refuses a call before it reaches you when the caller may not make it (section 8). What it cannot know is
 your data: check every ticket an argument carries against your own subjects, and refuse one you did not issue.
 
 ## 4. Add a command or a scope
@@ -148,9 +148,14 @@ It signs with a throwaway key under a test key id, never the release key. Every 
 Before your tool runs, the SDK has made sure that:
 
 - nothing runs before the Bot provisions the plugin's key;
-- a screen's call comes from an open the plugin certified, and names a tool in that screen's `permissions.tools`;
-- a resolve and a routine's query only read;
+- a call that names an app or an open, whatever its origin, comes from an open the plugin certified for that app and
+  names a tool in that app's `permissions.tools`;
+- a resolve, a routine's query and a caller of an origin the SDK does not know, or no caller at all, only read;
 - a routine's turn only reads, or calls a write the routine declares.
+
+Who may call a tool at all is its audience ([protocol 1.0, 16.4](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)): the model can call any tool unless the
+audience leaves out `"agent"`. A generated widget is offered only a tool whose audience lists `"widget"`; Hello's
+lists none, so no widget reaches it.
 
 Yours:
 

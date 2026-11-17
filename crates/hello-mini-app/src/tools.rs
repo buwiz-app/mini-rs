@@ -1,10 +1,7 @@
 //! Hello's tools: `hello_greet`, and `hello_resolve` for the `/hello`
 //! command and the `@hello:friend` scope.
 //!
-//! The SDK has already checked the caller against the manifest (a call through
-//! an app against that app's grant; a resolve, a routine's query and a caller it
-//! does not know only read). A generated widget reaches a tool only if the tool's
-//! audience says "widget"; Hello's say nothing, so none does. What is left is
+//! The SDK has already checked who may call (docs/guide.md, section 8). What is left is
 //! Hello's own rule: a ticket Hello did not issue is refused, not guessed at (P1).
 
 use buwiz_plugin::{Args, Caller, Tickets, Tool, fail, ok};
