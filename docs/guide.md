@@ -9,7 +9,7 @@ You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
 reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
 package. The protocol is Buwiz Mini App Protocol 1.0
-([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
 
 The native screen in this repo runs in Buwiz Bot only for Buwiz's own plugins (publisher `app.buwiz`). Every other
 publisher starts from [mini-tsx](https://github.com/buwiz-app/mini-tsx), which has TSX screens.
@@ -62,10 +62,10 @@ hello-mini-app package <plugin.json> <out> <platform> [--published <plugin.json>
    `read_only: true` unless it changes data.
 2. Add its arm to `call()`. Answer `ok(json!({…}))`, or `fail(code, message)` with a code such as `not_found` or
    `invalid_args` and a message the user can read.
-3. A screen that calls it lists it in its app's `permissions.tools` in `manifest.rs`; the model can call any tool.
+3. A screen that calls it lists it in its app's `permissions.tools` in `manifest.rs`; the model can call any tool unless its audience leaves out `"agent"`, and a generated widget only one that lists `"widget"` ([16.4](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)).
 4. Test it in `tests/` through the harness (section 7).
 
-The SDK refuses a call before it reaches you when the caller may not make it (section 8). What it cannot know is
+The SDK refuses a call before it reaches you when the caller may not make it (a call through an app that does not list the tool; a write from a resolve, a routine's query or a caller of an origin it does not know; [who calls](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md), 16.1). What it cannot know is
 your data: check every ticket an argument carries against your own subjects, and refuse one you did not issue.
 
 ## 4. Add a command or a scope
@@ -136,7 +136,7 @@ dependencies installed:
 
 ```sh
 git clone https://github.com/buwiz-app/buwiz-sdk
-git -C buwiz-sdk checkout e1de9c4487de6a9b6509e53ed1e990d699cad454
+git -C buwiz-sdk checkout 8f95537270815e75d0a23488ca12d175138c6d91
 (cd buwiz-sdk && bun install)
 BUWIZ_SDK_DIR=$PWD/buwiz-sdk tools/conformance.sh
 ```
@@ -160,9 +160,9 @@ Yours:
 - **Side effects behind explicit arguments** (P5), so a probe with `{}` changes nothing.
 - **Text without secrets.** A message, title or log carries no subject data and never the key (P4, P9).
 
-The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/security.md),
-[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/manifest.md) and
-[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/bridge.md).
+The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/security.md),
+[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/manifest.md) and
+[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/bridge.md).
 
 ## 9. Accounts
 
