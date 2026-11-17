@@ -9,7 +9,7 @@ You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
 reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
 package. The protocol is Buwiz Mini App Protocol 1.0
-([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
 
 The native screen in this repo runs in Buwiz Bot only for Buwiz's own plugins (publisher `app.buwiz`). Every other
 publisher starts from [mini-tsx](https://github.com/buwiz-app/mini-tsx), which has TSX screens.
@@ -62,7 +62,7 @@ hello-mini-app package <plugin.json> <out> <platform> [--published <plugin.json>
    `read_only: true` unless it changes data.
 2. Add its arm to `call()`. Answer `ok(json!({…}))`, or `fail(code, message)` with a code such as `not_found` or
    `invalid_args` and a message the user can read.
-3. A screen that calls it lists it in its app's `permissions.tools` in `manifest.rs`; the model can call any tool.
+3. A screen that calls it lists it in its app's `permissions.tools` in `manifest.rs`; who else may call it is in section 8.
 4. Test it in `tests/` through the harness (section 7).
 
 The SDK refuses a call before it reaches you when the caller may not make it (section 8). What it cannot know is
@@ -136,7 +136,7 @@ dependencies installed:
 
 ```sh
 git clone https://github.com/buwiz-app/buwiz-sdk
-git -C buwiz-sdk checkout e1de9c4487de6a9b6509e53ed1e990d699cad454
+git -C buwiz-sdk checkout 8f95537270815e75d0a23488ca12d175138c6d91
 (cd buwiz-sdk && bun install)
 BUWIZ_SDK_DIR=$PWD/buwiz-sdk tools/conformance.sh
 ```
@@ -148,9 +148,14 @@ It signs with a throwaway key under a test key id, never the release key. Every 
 Before your tool runs, the SDK has made sure that:
 
 - nothing runs before the Bot provisions the plugin's key;
-- a screen's call comes from an open the plugin certified, and names a tool in that screen's `permissions.tools`;
-- a resolve and a routine's query only read;
+- a call that names an app or an open, whatever its origin, comes from an open the plugin certified for that app and
+  names a tool in that app's `permissions.tools`;
+- a resolve, a routine's query and a caller of an origin the SDK does not know, or no caller at all, only read;
 - a routine's turn only reads, or calls a write the routine declares.
+
+Who may call a tool at all is its audience ([protocol 1.0, 16.4](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)): the model can call any tool unless the
+audience leaves out `"agent"`. A generated widget is offered only a tool whose audience lists `"widget"`; Hello's
+lists none, so no widget reaches it.
 
 Yours:
 
@@ -160,9 +165,9 @@ Yours:
 - **Side effects behind explicit arguments** (P5), so a probe with `{}` changes nothing.
 - **Text without secrets.** A message, title or log carries no subject data and never the key (P4, P9).
 
-The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/security.md),
-[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/manifest.md) and
-[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/e1de9c4487de6a9b6509e53ed1e990d699cad454/docs/bridge.md).
+The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/security.md),
+[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/manifest.md) and
+[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/bridge.md).
 
 ## 9. Accounts
 

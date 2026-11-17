@@ -1,9 +1,8 @@
 //! Hello's tools: `hello_greet`, and `hello_resolve` for the `/hello`
 //! command and the `@hello:friend` scope.
 //!
-//! The SDK has already checked the caller against the manifest (an app's
-//! grant, read-only resolves and routines). What is left is Hello's own
-//! rule: a ticket Hello did not issue is refused, not guessed at (P1).
+//! The SDK has already checked who may call (docs/guide.md, section 8). What is left is
+//! Hello's own rule: a ticket Hello did not issue is refused, not guessed at (P1).
 
 use buwiz_plugin::{Args, Caller, Tickets, Tool, fail, ok};
 use serde_json::{Value, json};
