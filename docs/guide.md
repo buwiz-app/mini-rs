@@ -9,7 +9,7 @@ You write what is yours: the manifest, the tools, the screens. The SDK
 ([buwiz-app/buwiz-sdk](https://github.com/buwiz-app/buwiz-sdk), crate `buwiz-plugin`) does the protocol: MCP, the
 reserved `buwiz.*` tools, session certificates, tickets, pushed account tokens, the caller checks and the release
 package. The protocol is Buwiz Mini App Protocol 1.0
-([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
+([the spec](https://github.com/buwiz-app/buwiz-sdk/blob/f63038d5cdbb05a20d9f329be3a85a8a6f3e8f8d/docs/protocol-1.0.md)); the manifest's `protocol` is `1.0.0`, protocol 1.0.
 
 The native screen in this repo runs in Buwiz Bot only for Buwiz's own plugins (publisher `app.buwiz`). Every other
 publisher starts from [mini-tsx](https://github.com/buwiz-app/mini-tsx), which has TSX screens.
@@ -136,7 +136,7 @@ dependencies installed:
 
 ```sh
 git clone https://github.com/buwiz-app/buwiz-sdk
-git -C buwiz-sdk checkout 8f95537270815e75d0a23488ca12d175138c6d91
+git -C buwiz-sdk checkout f63038d5cdbb05a20d9f329be3a85a8a6f3e8f8d
 (cd buwiz-sdk && bun install)
 BUWIZ_SDK_DIR=$PWD/buwiz-sdk tools/conformance.sh
 ```
@@ -153,7 +153,7 @@ Before your tool runs, the SDK has made sure that:
 - a resolve, a routine's query and a caller of an origin the SDK does not know, or no caller at all, only read;
 - a routine's turn only reads, or calls a write the routine declares.
 
-Who may call a tool at all is its audience ([protocol 1.0, 16.4](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/protocol-1.0.md)): the model can call any tool unless the
+Who may call a tool at all is its audience ([protocol 1.0, 16.4](https://github.com/buwiz-app/buwiz-sdk/blob/f63038d5cdbb05a20d9f329be3a85a8a6f3e8f8d/docs/protocol-1.0.md)): the model can call any tool unless the
 audience leaves out `"agent"`. A generated widget is offered only a tool whose audience lists `"widget"`; Hello's
 lists none, so no widget reaches it.
 
@@ -165,9 +165,9 @@ Yours:
 - **Side effects behind explicit arguments** (P5), so a probe with `{}` changes nothing.
 - **Text without secrets.** A message, title or log carries no subject data and never the key (P4, P9).
 
-The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/security.md),
-[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/manifest.md) and
-[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/8f95537270815e75d0a23488ca12d175138c6d91/docs/bridge.md).
+The full rules: the SDK's [security checklist](https://github.com/buwiz-app/buwiz-sdk/blob/f63038d5cdbb05a20d9f329be3a85a8a6f3e8f8d/docs/security.md),
+[manifest reference](https://github.com/buwiz-app/buwiz-sdk/blob/f63038d5cdbb05a20d9f329be3a85a8a6f3e8f8d/docs/manifest.md) and
+[bridge](https://github.com/buwiz-app/buwiz-sdk/blob/f63038d5cdbb05a20d9f329be3a85a8a6f3e8f8d/docs/bridge.md).
 
 ## 9. Accounts
 
