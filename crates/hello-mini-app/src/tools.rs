@@ -27,12 +27,14 @@ pub fn list() -> Vec<Tool> {
                 "properties": { "ticket": { "type": "string", "description": "A friend's ticket (tkt_…)" } }
             }),
             read_only: true,
+            meta: None,
         },
         Tool {
             name: RESOLVE,
             description: "Resolve /hello and @hello:friend tokens.",
             input_schema: json!({ "type": "object" }),
             read_only: true,
+            meta: None,
         },
     ]
 }
